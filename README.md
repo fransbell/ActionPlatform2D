@@ -1,2 +1,2 @@
 # ActionPlatform2D
-Godot Action Platformer 
+backup / notes to my ongoing godot project.
