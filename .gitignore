@@ -1,0 +1,10 @@
+.import/
+addons/
+default_env.tres
+game.gd
+icon.png
+icon.png.import
+main.tscn
+project.godot
+src/
+

@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Entity/Core/ActionPlatform2D.gd" type="Script" id=1]
+
+[node name="ActionPlatform2D" type="Node"]
+script = ExtResource( 1 )
+
+[node name="jump" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="jump_input_buffer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="jump_forgive" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
