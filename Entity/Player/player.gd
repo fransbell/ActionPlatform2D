@@ -17,11 +17,10 @@ func _ready():
 	}
 	#bh2D.set_setting("JUMP",true) #set usage
 	state = $AnimationTree.get("parameters/playback")
-""""
+	
 # connect signal {anim_state} from ActionPlatform2D 
 # signal anim_state return string
 # need to setup AnimationPlayer/AnimationTree  state machine into following name
 # Idle Walk Jumping Peak Falling Wallslide Walljump Grab
-"""
 func _on_anim_state(event):
 	state.travel(event)

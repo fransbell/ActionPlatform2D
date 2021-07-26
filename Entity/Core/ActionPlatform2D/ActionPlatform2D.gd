@@ -14,8 +14,6 @@ export var AirModifier = 1
 
 onready var player = get_parent()#get_node("../../player")
 
-var Slide_modifier = 1
-
 var velocity = Vector2.ZERO
 var _dir = 0
 var _timer
@@ -25,6 +23,9 @@ var Dash = 0
 
 var core_overwrite = false
 var scriptProcess = false
+
+var simulate_left = false
+var simulate_right = false
 
 var dir_input_stack = ["blank"]
  
@@ -39,19 +40,19 @@ var _setting = {
 
 signal anim_state
 
-enum state {IDLE,WALK,JUMP,WALLSLIDE,WALLJUMP,GRAB}
-#emit signal with emit_signal("anim_state", state)
-
 #initialize timer
 onready var timer_jump = get_node("jump")
 onready var timer_jump_input = get_node("jump_input_buffer")
 onready var timer_jump_forgive = get_node("jump_forgive")
+
+var AC2D = State.new()
 
 func _ready():
 	checkNode()
 	timer_jump.connect("timeout", self, "timer_jump_timeout")
 	timer_jump_input.connect("timeout", self, "timer_input_timeout")
 	timer_jump_forgive.connect("timeout", self, "timer_forgive_timeout")
+	AC2D.init(["idle","walk","jump","fall","slide","kick","dash"],"idle")
 	
 
 func _physics_process(delta):
@@ -74,12 +75,19 @@ func checkNode():
 
 # main movement
 func update_velocity(delta):
+	
+	
+	var move_right = Input.is_action_pressed("right")|| simulate_right
+	var move_left = Input.is_action_pressed("left")|| simulate_left
+	
+	if move_right:
+		velocity.x = 1
+		velocity.x *= Acceleration*50
+	
+	if move_left:
+		velocity.x = -1
+		velocity.x *= Acceleration*50
 		
-	if Input.is_action_pressed("right"):
-		velocity.x += Acceleration
-		
-	if Input.is_action_pressed("left"):
-		velocity.x -= Acceleration
 		
 	if !Input.is_action_pressed("left") and !Input.is_action_pressed("right"):
 		velocity.x = lerp(velocity.x,0,0.6)
@@ -107,7 +115,7 @@ func update_velocity(delta):
 			is_falling = true
 
 	timer_update()
-	velocity.y += Gravity * delta * Slide_modifier
+	velocity.y += Gravity * delta
 	
 	velocity.y = clamp(velocity.y, -JumpMax,JumpMin)
 	velocity.x = clamp(velocity.x, -Maxspeed,Maxspeed)
@@ -119,14 +127,18 @@ func animated_sprite():
 	
 	if velocity.x > 0 or velocity.x < 0:
 		emit_signal("anim_state", "Walk")
+		AC2D.set_state("walk")
 	else:
 		if player.is_on_floor():
 			emit_signal("anim_state", "Idle")
+			AC2D.set_state("idle")
 	
 	if velocity.y < 0:
 		emit_signal("anim_state", "Jump_Loop")
+		AC2D.set_state("jump")
 	elif velocity.y > 0:
 		emit_signal("anim_state", "Falling")
+		AC2D.set_state("fall")
 	
 	if velocity.x < 0:
 		player.get_node("sprite").flip_h = true
